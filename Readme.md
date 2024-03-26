@@ -20,7 +20,7 @@
 #### .env.sample  --> to push env variable to git 
 
 
-#### src: 
+#### src:  folder
 
 #### index.js:
 
@@ -58,7 +58,42 @@
 
 - we will resolve this later
 
+### inside src create
 
+#### controllers: folder
+
+#### db: folder to store database connection
+
+#### middlewares: folder to store middle ware functionalities
+- codes that we need to run in between
+- a request arise and the request is fullfilled by server, but before that in between if we want to do some checkings we can do with middlewares
+
+#### models: folder to store data models
+
+#### routes: folder to store different routes
+
+#### utils: folder to store utilities
+- example: file uploading, mailing, etc
+
+
+
+#### Prettier - dev dependency
+
+- install: <code>npm i -D prettier</code>
+
+- to config prettier, create a file <code>.prettierrc</code>
+
+- content: <code> {
+    "singlequote": false,
+    "bracketSpacing": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "semi": true 
+}
+</code>
+
+- also create a file to ignore certain files using prettier , create file <code>.prettierignore</code>
+- so the files are /.vscode, /node_modules, ./dist,  *env, .env, .env.* 
 
 
 
