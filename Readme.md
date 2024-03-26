@@ -1,0 +1,1 @@
+# Uniconn - a social platform to connect stdents, faculties, university together under a hood
