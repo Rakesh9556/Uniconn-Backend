@@ -58,6 +58,7 @@
 
 - we will resolve this later
 
+
 ### inside src create
 
 #### controllers: folder
@@ -207,7 +208,7 @@ export default connectDB
 </code>
 
 
-#### Solve dotenv ---> from commonjs type to module type
+#### Solve dotenv ---> from commonjs type to module type -> in main index.js
 
 - so first import: <code>import dotenv from "dotenv";</code>
 
@@ -216,6 +217,76 @@ export default connectDB
 })
 
 - inside dev script in <code>package.json</code>  add <code>-r dotenv/config --experimental-json-modules</code>
+
+
+#### Set up server after database connection
+
+- after connectDB()
+- add two method <code>.then()</code> and <code>.catch()</code>
+
+
+
+### Cookie parser
+
+- npm i cookie-parser
+
+### Cors : enable cross origin resource sharing
+
+- npm i cors
+
+- <code>app.use</code> --> used when we use middlewares
+
+
+
+### app.js file setup
+
+##### Most used requests
+
+- 1. <code>req.params</code> : most of the data come from url comes from <code>req.params</code>
+- 2. <code>req.body</code> : data can be come in many ways json, url, request.body, etc
+
+##### Setup
+
+- 1. create a express skeleton
+- 2. import both cookie parser and cors 
+
+- 3. Configure 
+- app.use(cors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true 
+}))
+
+<code>
+// accepting json (form data)
+app.use(express.json({limit: "16kb"}))   
+
+// accepting url data
+app.use(express.urlencoded({extended: true, limit: "16kb"}))   // extended: we can give objects inside objects
+
+// config for storing files and folders
+app.use(express.static("public"))
+
+// config to accept cookies
+app.use(cookieParser())
+</code>
+
+- 4. Set middleware
+
+#### Solve async....await lafda
+
+- 1. sabu thara amaku database saha samparka karibara achi ta sabu thara async...await wrapper baneiba apekhya ame gote emiti utilty wrappper function baneidaba so jetebele bi amaku kichhi execute karibara achhi ame wrapper function re ama request pass karidaba  (Industry standard) ---> tara naa haba <code>asyncHandeler.js</code>   
+
+- 2. ame jauta bi use karipariba --> <code>try...catch</code> or <code>promises</code>
+
+#### Read about nodeJS API error and response to handle error and response in more centralized way
+
+- 1. gote error handle kariba pain <code>util</code> bhitare file banaa, naa de <code>ApiError.js</code>
+
+- 2. similarly response handle kariba pain <code>util</code> bhitare file banaa, naa de <code>ApiResponse.js</code>
+
+#### Learn Server status code
+
+
 
 
 
