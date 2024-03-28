@@ -38,6 +38,7 @@
 
 
 #### Nodemon - dev dependency
+
 - problem arise when we reload or update something in files, we need to restart the server again and again to see the updated changes, so to resolve this we can use thirdparty utility Nodemon
 
 - install: <code>npm i nodemon </code>  ----> main dependency
@@ -111,11 +112,14 @@
 
 - create a port ---> <code>PORT = 8000</code>
 
-- create a mongodb url to cconnect ------> <code>MONGODB_URI = mongodb+srv://rakeshg:<password>@cluster0.zuzpq.mongodb.net</code>
+- create a mongodb url to cconnect ------> <code>MONGODB_URI = mongodb+srv://rakeshg:<password>@cluster0</password>.zuzpq.mongodb.net</code>
 
 #### 2. Define database in vs code
+
 - define the name of the database inside <code>constants.js</code> and then export it
 - ex: <code>export const DB_NAME = "uniconn"</code> 
+
+
 
 #### 3. Database Connection
 
@@ -126,7 +130,8 @@
 
 - <code>mongoose.connect('url')</code> --> connect the database, but don't do this always use function to do the connection
 
-- Things required for connection
+
+##### Things required for connection
 
 - <code>npm i dotenv</code>  ---> to import dotenv dependency
 - <code>npm i mongoose</code>   ---> to import mongoose
@@ -141,8 +146,11 @@
 
 - 2. database always lie in far distance, means it will take time to load, so always use <code>async...await</code>  ----> used for error handelling
 
+
 #### IIFE  --> function that is called immediately after it is declared
 - Syntax: <code>(() => {})()</code>
+
+
 
 ### Connection:
 
@@ -285,6 +293,85 @@ app.use(cookieParser())
 - 2. similarly response handle kariba pain <code>util</code> bhitare file banaa, naa de <code>ApiResponse.js</code>
 
 #### Learn Server status code
+
+
+### Model creation
+
+- 1. <code>models</code> dir bhitare <code>user.model</code> gote banaa
+
+- 2. mongoose automatically unique id generate karidaba, so sesabu ku amaku handle karibaku padibani 
+- 3. mongodb unique id ku <code>bson</code> format re store kare
+
+
+### Learn mongoose aggregation pipeline (Framework)
+
+- get from <code>npmjs</code>
+- <code>npm i mongoose-aggregate-paginate-v2</code>
+- use: <code>import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2"</code>
+- add mongoose aggregrator as plugin
+
+
+### learn bcrypt and bcrypt.js (used)
+
+- hash the password
+
+- we ame directly password encryption karipariba nahin so ame use kariba hooks(in middleware) ----> <code>pre hooks</code>
+
+- first <code>bcrypt</code> ku import kara <code>user.models.js</code> file re
+
+- Pre hook: gote middle ware jauta ki ame excute karipariba -----> just ama data save haba pubaru
+
+- so pre hook use kare ---> pre hook re bahut sara event achi but ame use karib "save" event re ---> means jebe jebe ama data re kichhi changes save haba setebele ame pre hook ku  execute kariba ---> pre hook re 2 ta parameter achhi 1. kau event kariba and 2.kna callback kariba
+
+- so callback re ame gote function ku callback kariba but ame arrow function use kariparibani kahinki na arrow function <code>this</code> -keyword ra context janini, so ame normal function use kariba and a function time consume kare so ame <code>async</code> use kariba
+
+- function re <code>next</code> pass kariba, kahinki na sabu kama sarigala pare <code>next</code> ku call karibaku padiba taki process agaku badhiba
+
+- so next <code>this</code> context use kari password ku access kari taku encrypt kariba ---> encrypt kariba pain <code>bcrypt.hash()</code> method use kariba padiba ---> bcrypt method re 2 ta parameter pass haba 1. kahaku hash kariba and 2. kete round hash use haba(number dabaku padiba)
+ 
+- last ku <code>next()</code> ku call kara --- kahinki na middleware ra kama sarile next process ku run kariba taki required task complete haba
+
+- but gote problem asuchi, jebe jebe data save haba ki update haba sabuthara a middleware password ku save karidaba ---> avatar, name, etc change hele middleware password save karidaba
+
+- so conditional statement use kariba ---> so ame gote method use kariba aita dekhiba pain j password re kichhi modified heichi ki nahin jadi heithiba then ame password ku save kariba nahele <code>next()</code> flag ku return karidaba
+
+- so <code>this.isModified("password")</code> - eithire <code>isModified()</code> method chek kariba j password re kichhi change heichi na nahin jadi true hela tahale ame password ku save kariba
+
+- ebe ame kichhi method use kariba user ku check kariba pain j user jaha password input karichi sesabu thik na bhul ---> kahinki na database the password encrypted heiki achhi
+
+- so ame <code>userSchema</code> re kichhi method baneiba pain <code>.methods</code> object ku use kari ame bahut gudae property ku access karipariba or nijara bi create karipariba
+
+- so ame nijara gote property add kale jaha ra name hauchi <code>isPasswordCorrect</code> - a property bhitare ame gote funnction create kale jauta ki check kariba j user jaha password input karichi seita database re store thiba password saha match karuchi na nahin  ---> jehetu ame password compare karuche so function ra parameter re amaku password pass karibaku padiba
+
+- but ethi gote issue amara database re thiba password ta encrypt heiki achi au user jaha password daba seita string re achi, tahale compare kemiti kariba?? ---> so ame use kariba <code>bcrypt</code> ra gote method jahara name hela <code>compare()</code> - a  method ku 2ta parameter darkar 1. <code>password</code> -- (user input jaha karithiba) and 2. <code>this.password</code> -- (encrypted password)  --- maethod pakhare access achi encrypted password ra, so <code>this</code> keyword re ea access karidaba 
+
+- note kara j a process re time lagiba jehetu <code>cryptography</code> use heichi so <code>await</code> use karibaku padiba and last ku return karidaba 
+
+### JWT (jasonwebtoken)  (used)
+
+- to create tokens
+- go to jwt.io to see how token made
+- import both in <code>user.models.js</code> file
+
+
+- jwt hauchi -> bearer token
+
+- ara access ku <code>env</code> varibales file bhitare lekhibaku padiba
+
+- so <code>ACCESS_TOKEN_SECRET</code> varibale bhitare gote complex string generate kari laekhibaku padiba
+
+- bahut sara tool achi jauthi ki ame complex string generate karipariba jemiti ki: <code>SHA-256</code>
+
+- similarly ame ahuri field use kariba jemiti ki <code>ACCESS_TOKEN_EXPIRY</code>, <code>REFRESH_TOKEN_SECRET</code> and <code>REFRESH_TOKEN_EXPIRY</code>
+
+- ame <code>access token</code> ku database re store karibani, hele <code>refresh token</code> ku database re store kariba
+
+- ame <code>access token</code> and <code>refresh token</code> generate kariba pain method baneiba <code>user.models.js</code> file re
+
+- <code>jwt</code> pakhare <code>sign()</code> method achi jaha ki token generate kare
+
+ 
+
 
 
 
