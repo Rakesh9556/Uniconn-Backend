@@ -370,8 +370,189 @@ app.use(cookieParser())
 
 - <code>jwt</code> pakhare <code>sign()</code> method achi jaha ki token generate kare
 
+
+
+### File Uploading 
+
+- 1. frontend pakhare file uploading pain adhika resource nahin, fronetend re ame kebala form baneipariba, file ku browse karipariba and link deipariba upload kariba pain ---> but actual upload backend re hue
+
+- 2. production level re file handeling kebe nija server re hueni, most of the case third party service dwara hin heithae or aws
+
+- 3. File uploader code ku separte util function baneiki rakhiba or middleware kari rakhiba ---> ame aku standaalone kari rakhiba taki reuse karipariba ame 
+
+- 4. widely used service file handeling pain hauchi <code>Cloudinary</code>
+
+- 5. file upload kariba pain amaku 2 package nihati darkar: 1. <code>express-fileupload</code> and 2. <code>multer</code> ---> a 2 ta bhitaru gote choose karibaku padiba
+
+- 6.  cloudinary ku jaiki account create kari, taku insatll kariba project re
+
+- 7. multer ku install kariba project re
+
+#### Kemiti file storing work kariba
+
+- ame multer through re user tharu file naba and taku ama local server re temporary rakhidaba ---> then ame cloudnary ku use kariki local storage ru file nei cloudnary server re rakhidaba
+
+
+- 8. cloudinary ku config kariba <code>util</code> folder bhitare -->  goal hela aa bhiatare jaha bi file asiba filesystem through ru asiba  jau guda ki server re upload heisarichi
+
+- 9. so cloudinaray file re <code>cloudinaray</code> au <code>fs</ code> - file system ku import kariba --> file system help kare amaku file ku read, write, remove, permission cahnge kama kariba pain 
+
+- 10. file system work kare 2 ta method re <code>link</code> au <code>unlink</code>  --> file system ru kichhi file delete kale seita unlink heijae and add kale link heijae 
+
+- 11. jehetu cloudinary config gudaka sensitive so sesabu ku ame <code>.env</code> file bhitare store kari rakhiba  ---> asabu configuration hin amaku file uploading permission daba
+
+- 12. <code>cloudinary uploader</code> --> ku use kari ame ame local storage re file nei cloudinary re ipload karidaba, but gote issue achhi ---> asabu re bahut sara problem ase au time consuming file uploading samayare --> so se sabu ku handle kariba pain ame <code>try...catch</code> method and <code>async..await</code> use kariba  ----> asabu ku gote arrow function <code>uploadOnCloudinary</code> kariki gote varibale re store kariba
+
+- 13. arrow function re <code>localFilePath</code> parameter pass kariba --> aita hauchi se file re path jauta ki ama local machine re temporary bhabe store heichi ----> function bhitare <code>try..catch</code> us kari 2 ta condition pakeiba <code>try</code> bhitare --> 1. jadi <code>localFilePath</code> nahin tahale ame null return kariba nahale file upload error return karipariba and 2.jadi <code>localFilePath</code> available achi tahale <code>cloudinary uplaoder</code> ku use kari file upload kariba  ---> aa bhitare 2 ta parameter pass haba 1.<code>url or filepth</code> and 2.<code>options</code> , bahut gudae options achi but ame use kariba  <code>resource_type</code> - jauta ki amaka file ra type bateiba
+
+- 14. pura responce ku ame got variable re hold karidaba and tara name daba <code>response</code> taki ame response ku use kari <code>url</code> ku print karipariba ---> last ku reponse ku user ku return karidaba 
+
+- 15. jadi file uploading re error asila tahale for a safe cleaning purpose ame se file ku server ru hateidaba --> sethipain fail system ra gote method use kariba jaha ra name hauchi <code>unlinkSync()</code>  ---> a method synchroniously file ku hateidaba ama server ru ---> last ku <code>uploadOnCloudinary</code> function ku return karidaba
+
+
+### Middleware - Jiba purbaru mate dekha kari jibu (for understanding)
+
+- 1. ame <code>multer</code> ku use kari <code>middleware</code> baneiba
+
+- 2. one time create karidaba then jauthi jauthi amaku file upload capability darkar haba ame sethi  ame <code>multer</code> ku inject karidaba  (ex: registration form, photos upload)
+
+- 3. so first ame gote <code>multer.midddleware.js</code> file baneiba <code>midlleware</code> bhitare
+
+- 4. then se file bhitare multer ku import kariba ---> then <code>multer disk storage</code> config ku use kariba
+
+- 5.  <code>multer.diskStorage()</code> method bhitare gote function achi jaha bhitare 3 ta parameter achi ----- 1. req ---> user pakharu jau request asuchi, 2. file ---> sabu file ra access milijae store kariba pain and 3. cb --> callback  and <code>cb</code> bhiatare 2 ta parameter pass karibaku padiba 1.<code>null or error handle</code> and 2. <code>file location</code> -- jauthi ki ama file sabu store haba
+
+6. next <code>filename</code> field bhitare <code>cb</code> method ra 2 ta parameter achi ---> 1. <code>null</code> and 2.<code>filename.originalName</code> set kariba ---> ea kan kariba na user jau name re file ku upload kariba exactly sei same name re file store haba
+
+7. last ku export karidaba <code>multer</code> ku
+
+
+### HTTP 
+
+- http au https re kebala protocol ra difference --> emiti kichhi khass difference nahin --> htttp re data clear text re pass hue (jaha lekhithiba seia hin pass haba) , but https re data upare gote layer chadhijae jauta ki data ku encrypt karidea 
+
+- most used words heal <code>URL</code> - resource locator, <code>URI</code> - resource identifier and <code>URN</code> - resource name
+
+##### HTTP Headers
+
+- https request patheila bele ame kichhi information bi taa sangare patheithau jahaku ame taku kahu <code>metadata</code> - key value (ex: {name: rakesh}) sent along with request and response
+
+
+##### Headers kna karanti ?
+
+- caching, authentication, state management
+- 2012 purabaru header ra prefix re <code>X</code> lekhibaku pade but ebe lekhiba darkar nahin 
+
+
+##### Categories of header
+
+- Request header --> handle request data from client
+- Response header --> handle data from server
+- Representation header --> to see data encoding/compression
+- Payload headers --> data (jaha bi data send karibara achi)
  
 
+ ##### Most common headers
+
+ - accept : application/json data 
+ - user- agent  : ethiru ame janipariba jau kau application ru request asichi (postman, browser, etc)
+ - authorization : 
+ - content-type
+ - cookie
+ - cache-control
+
+ ##### CORS Header
+ 
+ - Access-Control-Allow-Origin
+ - Access-Control-Allow-Credentials
+ - Access-Control-Allow-Methods
+
+
+ ##### Security Header
+
+ - Cross-Origin-Embedded-Policy
+ - Cross-Origin-Opener-Policy
+ - Control-Security-Policy
+ - X-XSS-Protection
+
+ ##### HTTP Methods - basic set of operations that are used to interact with the server  -- Postman API
+
+ - <code>GET</code> : retrieve resource
+ - <code>POST</code> : interact with resource (mostly add resource)
+ - <code>PUT</code> : replace a resource
+ - <code>DELETE</code> : remove a resource
+ - <code>PATCH</code> : change part of resource
+ - <code>HEAD</code> : no message body (response headers only)
+ - <code>OPTIONS</code> : what operations are available
+ - <code>TRACE</code> : loopback test (get some data)
+
+ ##### HTTP Status Code
+ 
+ - 1XX : Informational
+ - 2XX : Success
+ - 3XX : Redirection
+ - 4XX : Client error
+ - 5XX : Server error
+
+ ###### Mostly used:
+
+ - 100 : Continue
+ - 102 : Processing
+ - 200 : Ok
+ - 201 : Created
+ - 202 : Accepted
+ - 307 : Temporary redirect
+ - 308 : Permanent redirect
+ - 400 : Bad request
+ - 401 : Unauthorized
+ - 402 : Payment required
+ - 404 : Not found
+ - 500 : Internal server error
+ - 504 : Gateway timeout 
+
+ setings and config ends here
+ <hr>
+
+
+ ### Router and Controller
+
+ #### Controller setup
+
+ 1. create a <code>user.controller.js</code> file inside <code>controllers</code> directory
+
+ 2.  import the <code>asyncHandler</code> helper file  
+
+ 3. create a method to register user and use <code>asyncHandeler</code> function  --> also create a status code and pass a json message and export the <code>registorHandelor</code> as object
+
+ 4. now create a <code>route</code> to handle the register --> create <code>useer.route.js</code> file inside <code>routes</code> directory
+
+ 5. import <code>router</code> from <code>express</code> and set up a basic route layout
+
+ - Note** all the routes will exported to <code>app.js</code> file 
+
+
+
+
+
+ #### Router ---> how to create and repeat
+
+ - routes ku ame express through re import karipariba and ara gote skeleton layout create kariba and aku separate <code>router</code> dir bhitare rakhiba
+
+ - but ame <code>routes</code> ku directly use kariparibani, sethipain amaku <code>middleware</code> use karibaku padiba, so amaku <code>app.get()</code> jagare <code>app.use()</code> ku use kariba  ----> <code>app.get()</code> ame setebele use karuthile jetebele ame nijara routes ku <code>app.js</code> file bhitare directly lekhuthile but ebe jehutu ame <code>routes</code> pain separate dir use kariche sethipain <code>app.get()</code> use kariparibani 
+
+ - <code>app.use("/user", userRouter)</code> --> use() method ku use kari gote <code>/user</code> route create kariba --> jebe bi user <code>/user</code> pass kariba setebele ame <code>userRouter</code> middleware ku amara control deidaba
+
+ - for testing api's use <code>POSTMAN</code>
+
+ - <code>Postman</code> bhitare collection ku jiba  --> sethi url re ama server ra url paste karidaba route sahita --> tapare method re <code>post</code> select kari send kariba
+
+
+ ### difference b/w two import statement <code>app</code> and <code>{app}</code>
+
+
+
+ 
+  
 
 
 

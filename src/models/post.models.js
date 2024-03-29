@@ -38,7 +38,7 @@ const postSchema = new Schema(
         timestamps: true
     }
 )
-
+ 
 postSchema.plugin(mongooseAggregatePaginate)
 
 export const Post = mongoose.model("Post", postSchema)
