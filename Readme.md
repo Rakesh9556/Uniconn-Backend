@@ -550,6 +550,58 @@ app.use(cookieParser())
  ### difference b/w two import statement <code>app</code> and <code>{app}</code>
 
 
+ ### Logic building - Register Controller
+
+ -  register kariba pain first frontend ru user details anibaku padiba
+ - tapare validate kariba ---> user empty data send karideini ta , email correct format re achi na nahin (check: not empty)
+ - check kariba user agaru exist achi ki nahin (check: username or email)
+ - avatar achi na nahin check kariba  
+ - jadi user avatar deichi tahale se file ku cloudinary re upload karidaba (check: avatar)
+ - user object gote create kariba -- create entry call inn db
+ - frontend ku jaha response daba sethiru password au refresh token hateidaba 
+ - check kariba user create heichi ki nahin - heithile user object ku return kariba nahele error ku return kariba 
+
+
+ #### 1. How to take user details from front  end
+
+ 1. <code>req.body</code> re ame user tharu sabu detils collect karipariba --> but data details url ru bi asipare --> asabu ku ame futeure re handle kariba 
+
+ 2. <code>user.controller.js</code> re data collect kariba frontend ru
+ 
+ 3.  <code>req.body</code> re jau data asiba taku ame extract karipariba --> destructure kariki
+
+
+
+ ###### File handling
+
+ 1. file upload pain ame gote middle ware create karithile jahara name hauchi <code>multer.middleware.js</code> , so ame a middle ware ku use kariba ama file ku upload kariba pain
+
+ 2. so ame se multer middle ware ku import kariba <code>user route bhitare</code>
+
+ 3. ame middleware use kariba post bele <code>registerUser</code> method execute haba purbaru ---> so ame register user purbaru middle ware ku use kariba <code>upload</code> re <code>fields</code> option use kari  --> <code>fileds</code> option array re input nea  --> so ame atrray bhitare object naba separate file ra input naba pain --> object bhitare first field rahiba <code>name</code> which means, first file jau naba taku kau name re identify kariba, second <code>maxCount</code> keteta file accept kariba
+
+ 4. nexxt ame validation kariba user data ku and sethire ame error ku define kariba paina jau <code>ApiError.js</code> file create karithile taku use kariba --> so import kariba se file ku au use kaeriba as a function taa bhitare 2 ta parameter pass kariba --> 1. status code and 2. message
+
+ 5. ame <code>if</code> condition re sabu user data ku gote gote kari validate karipariba but amaku sabu pain condition lekhibaku padiba so ame kna kariba na ---> <code>if</code> bhitare gote array pass kariba jaha bhitare ki amaku se sabu parameter pass kariba jau sabu ku amaku validate karibara achi ---> gote special function achi <code>some()</code> - a function upto 3 ta argument accept kare  --> au true false return kare based on the condition --> a function bhitare ame <code>callback</code> use kariba
+
+ 6. next ame check kariba user already exist karichi ki nahin sethipain ame import kariba <code>User</code> ku <code>user.model.js</code> ru ---> ame jau user model re user ku export kariche taku ame bahut jagare use karipariba jemiti ki database saha direct connect kariba pain
+
+
+ - NOTE** : <code>export default</code> nakarithile ame kaunasi jinsa ku directly import kariparibani so sethipain amaku jaha bi import karibara achi <code>{  }</code> aa bhitare import kariba
+
+ 7. so ame <code>User</code> re <code>findOne()</code> method use kari find karipariba ---> generaly <code>finndOne()</code> bhiatare parameter pass kari ame check karipariba j email pubrau achhi ki nahin ki username purbaru achi ki nahin but au tike advance re multi parameter pain check kariba jemiti ki se email re au kau user name achhi ki nahin ---> so taa bhitare ame use kariba <code>$or</code> operator --> a <code>$or</code> bhitare array ku input nie au amaku jaha bi check karibara achi ame sabu input ku got gote object kari pass kariba (ex: username and email)  --> so <code>findOne()</code> method return kariba first data ku jaha <code>$or</code> operator bhitare thiba username and email ku match kariba  --> then a pura refernce ku ame gote varible re store karidaba and tara name daba <code>existedUser</code>  ---> next ame if condition pakei check jadi <code>existedUser</code> true return karuchi then ame gote nua error throw kariba 
+
+ 8. ame janiche j amara sabu data <code>req.body()</code> ru hin asuchi but jehetu ame <code>multer middleware</code> use karichu so ea amaku sabu data provide karuchi <code>req.files()</code> re so ame aita use kariba ama avatar ku check kariba pain---> but ame optionally chaining kariba ki avatar achi ki nahin ---> so aku bi gote varibale re store kari rakhidaba 
+
+ 9. next ame avatar ku upload kariba <code>localFilePath</code> ru <code>cloudinary</code> ku --> so sethipain already ame basic confi file banedeiche jahara name hela <code>cloudinary.js</code>  --> so aku import kariba ---> then ame se method ku use kariba taaa bhitare parameter pass kariba se file ra jahaku ame upload karibaku chanhuche  --> so ame parameter hauchi <code>avatarLocalPath</code>  --> uploading re time lage so ame use kariba <code>await </code> --> next aku ame got variable re wrap karidaba and similarly ame coverImage ku bi upload kariba  --> next check kariba j avatr file upload heichi na nahin jadi heini error throw kariba
+
+ 10. next jadi sabu thik thik achi tahale ame sabu info database re entry kareidaba --> ame janiche j kebala <code>User</code> from <code>user.model.js</code> pakhare database saha connect haba pain permission achi --> so <code>User</code> ku access kari <code>create()</code> method ku use kari object bhiatare ame sabu entry ku pass kari pariba --> entry re time lagiba so <code>await</code> user kariba and sabu ku got <code>user</code> varibale re wrap karidaba
+
+ 11. next ame check kariba j actually user create heichi na nahin ---> so <code>User.findById(user._id)</code> use kari ame user created heichi ki nahin find karipariba ---> find kariba pain time lagiba so ame <code>await</code> use kariba and aku bi gote <code>createdUser</code> variable re wrap karidaba --> next ame gote method use kariba <code>select()</code> --> aa bhiatare ame sesabu pass kariba jau sabu field amaku darkar nahin jadi user create heijaichi ---> but awkard hela ki eithire parameter sabu string re pass hue  --> ext ame condition lagei check kariba j ama user achi ki nahin jadi heini then error throw kariba 
+
+ 12. next ame dekhiba j amara user  successfully create heisarichi so ame ebe response send karidaba  --> ame structured response send kariba so sethipain ame <code>ApiRespose.js</code> ku use kariba --> so first amaku aku import karibara achhi <code>user.controller.js</code> re 
+
+
 
  
   
