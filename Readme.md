@@ -599,7 +599,17 @@ app.use(cookieParser())
 
  11. next ame check kariba j actually user create heichi na nahin ---> so <code>User.findById(user._id)</code> use kari ame user created heichi ki nahin find karipariba ---> find kariba pain time lagiba so ame <code>await</code> use kariba and aku bi gote <code>createdUser</code> variable re wrap karidaba --> next ame gote method use kariba <code>select()</code> --> aa bhiatare ame sesabu pass kariba jau sabu field amaku darkar nahin jadi user create heijaichi ---> but awkard hela ki eithire parameter sabu string re pass hue  --> ext ame condition lagei check kariba j ama user achi ki nahin jadi heini then error throw kariba 
 
- 12. next ame dekhiba j amara user  successfully create heisarichi so ame ebe response send karidaba  --> ame structured response send kariba so sethipain ame <code>ApiRespose.js</code> ku use kariba --> so first amaku aku import karibara achhi <code>user.controller.js</code> re 
+ 12. next ame dekhiba j amara user  successfully create heisarichi so ame ebe response send karidaba  --> ame structured response send kariba so sethipain ame <code>ApiRespose.js</code> ku use kariba --> so first amaku aku import karibara achhi <code>user.controller.js</code> re  ---> so amaku response send kariba pain <code>res</code> use kariba and then ame gote status send kariba jauta ki <code>res.status()</code> -- bhiatare <code>200</code> message send kariba and then gote <code>json</code> response send kariba same response re ----> new <code>ApiResponse()</code> use kari ---> taa bhitare response code , createdUser and gote message send kariba
+
+
+ ### Postman setup
+
+ 1. new tab open kari sethire url paste kari body select kari <code>form data</code> ku choose kariba and then sethire sabu entry ku pass kariba ---> ame <code>form data</code> use karuche instead of <code>json</code> kahinki na json re ame file input neiparibani
+
+
+ 2. amara sabu info ku ame cloudinary <code>media explorer</code> and atlas ra <code>collections</code> re dekhipariba 
+
+ 3. ame dekhiba j ama image successfully cloudinary re upload heisarichi so ame kna kariba na upload heisariba pare taku remove karidaba temporary ru --> so <code>cloudinary.js</code> file ku open kariba then ---> sethire file system ku unlink kariba <code>fs.unlink()</code>
 
 
 
