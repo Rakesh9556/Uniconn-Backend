@@ -1,13 +1,13 @@
 //   a middleware khali verify bateba j user achi ki nahin 
 
-import { ApiError } from "../utils/ApiError";
-import { asyncHandeler } from "../utils/asyncHandeler";
+import { ApiError } from "../utils/ApiError.js";
+import { asyncHandeler } from "../utils/asyncHandeler.js";
 import jwt from "jsonwebtoken"
-import {User} from "../models/user.models"
+import {User} from "../models/user.models.js"
 
-export const verifyJWT = asyncHandeler(async (req, res, next) => {
+export const verifyJWT = asyncHandeler(async (req, _, next) => {
     
-    try {
+    try { 
         // token ru access naba
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer","") 
     
@@ -16,19 +16,17 @@ export const verifyJWT = asyncHandeler(async (req, res, next) => {
         }
     
         // check token thik achi ki nahin
-        const decodedToken = json.verify(token, process.env.ACCESS_TOKEN_SECRET )
+        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET )
     
-        const user = await User.findById(decodedToken?._id).select(
-            "-password -refreshToken"
-        )
+        const user = await User.findById(decodedToken?._id).select("-password -refreshToken")
     
         if(!user){
             // discuss about frontend
-            new ApiError(401, "Invalid access token")
+            throw new ApiError(401, "Invalid access token")
         }
      
         // jadi user achi
-        req.user = user
+        req.user = user;
         next()
 
     } catch (error) {
