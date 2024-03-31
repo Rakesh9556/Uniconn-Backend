@@ -12,13 +12,22 @@ cloudinary.config({
 const uploadOnCloudinary = async (localFilePath) => {
     try {
         // if localFile path not exist
-        if(!localFilePath) return null;
+        if(!localFilePath) {
+          console.error('Local file path is empty or undefined');
+          return null;
+        }
+
+        // Log the local file path before upload
+        console.log('Uploading file to Cloudinary:', localFilePath);
+
+
         //upload the file on cloudinary
          const response = await cloudinary.uploader.upload(localFilePath, {
             resource_type: "auto"  // it will automatically detect the file type
          })
          // file has been uploaded successfully
-        //  console.log("File is successfully uploaded on cloudinary", response.url);
+         console.log("File is successfully uploaded on cloudinary", response.url);
+
         // remove the file after uploaded successfully 
         fs.unlinkSync(localFilePath)
         // console.log(response)

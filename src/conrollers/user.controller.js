@@ -13,7 +13,11 @@ const generateAccessAndRefreshTokens = async(userId) =>  {
         const user = await User.findById(userId)
         const accessToken = user.generateAccessToken()
         const refreshToken = user.generateRefreshToken()
-
+        
+        // Ensure accessToken and refreshToken are defined before returning
+        if (!accessToken || !refreshToken) {
+            throw new ApiError(500, "Access token or refresh token generation failed")
+        }
          // access token ame user ku send karidei thau but refresh token database re store kareithau
          user.refreshToken = refreshToken 
          // save kariba
@@ -78,7 +82,7 @@ const registerUser = asyncHandeler(async (req, res) => {
 
 
 // check for images, check for avatar
-    const avatarLocalPath = req.files?.avatar[0]?.path 
+    const avatarLocalPath = req.files?.avatar[0]?.path;
 
 // check for coverImage 
     // const coverImageLocalPath =  req.files?.coverImage[0]?.path
@@ -86,8 +90,6 @@ const registerUser = asyncHandeler(async (req, res) => {
     if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
         coverImageLocalPath = req.files.coverImage[0].path
     }
-
-
 
     // console.log("Req files:" + req.files);
 
@@ -156,11 +158,12 @@ const loginUser = asyncHandeler(async (req, res) => {
 
     // 1. req body ru data aniba
 
-    const {email, username, password} = req.body 
+    // const {email, username, password} = req.body 
+    const {email, password} = req.body 
     // console.log(email)
 
-    if(!(username || email)) { 
-        throw new ApiError(400, "Username or email is required")
+    if(!email) { 
+        throw new ApiError(400, "Email is required")
     }
 
     // if(username && email) { 
@@ -170,9 +173,10 @@ const loginUser = asyncHandeler(async (req, res) => {
     
     // username ki email ku user thu nei database saha validate kareiba
 
-    const user = await User.findOne({
-        $or : [{username}, {email}]
-    })
+    // const user = await User.findOne({
+    //     $or : [{username}, {email}]
+    // })
+    const user = await User.findOne({ email });
 
     // user ku find kariba  --- jadi nahin
     if(!user) {

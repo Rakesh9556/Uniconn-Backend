@@ -612,6 +612,11 @@ app.use(cookieParser())
  3. ame dekhiba j ama image successfully cloudinary re upload heisarichi so ame kna kariba na upload heisariba pare taku remove karidaba temporary ru --> so <code>cloudinary.js</code> file ku open kariba then ---> sethire file system ku unlink kariba <code>fs.unlink()</code>
 
 
+ ### Install CORS  package --> to allow request from all origin
+
+ - npm install cors
+
+
 
  
   
