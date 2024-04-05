@@ -261,7 +261,7 @@ const logoutUser = asyncHandeler(async (req, res) => {
 })
 
 
-// refresh token
+// refresh token where user can refresh his token
 
 const refreshAccessToken = asyncHandeler(async (req, res) => {
 
