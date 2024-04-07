@@ -374,7 +374,7 @@ const updateUserDetails = asyncHandeler(async (req, res) => {
 
     // Step3: update kariba pain data ku backend patheiba but ame kau user re update kariba, so first user find karib
     // update
-    const user = User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             // mongo operator
@@ -391,7 +391,7 @@ const updateUserDetails = asyncHandeler(async (req, res) => {
     ).select("-password")  // ame chanhune j update hela bela ame password au thare update hau so ame slect method re password ku hateidaba update ru
 
     // Step4: user ku return kariba gote response
-    res
+    return res
     .status(200)
     .json(new ApiResponse(200, user, "Profile updated"))
 
