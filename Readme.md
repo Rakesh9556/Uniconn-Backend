@@ -630,6 +630,42 @@ app.use(cookieParser())
 
 
 
+ # Subscription model
+
+ - subcriber au channel achhi so, jetebele jane subscriber chnnel ku subscribe kara stebele gote document create haba and taa bhitare field rahiba subscriber au channel, jetethara jete subsciber subsribe karibe nua document create haba
+
+
+### Gote channnel ra subscriber kemiti find kariba
+ - gote channel ra subscriber kete boli kemiti janiba -- so ame sesabu document ku select kariba jauthire channel ra name same thiba --. sesabu ku join kala pare amaku no. of subsriber milijiba
+
+ - so gote channel ra subcriber janibaku hele ame channel find kariba keteta documengt bhitare same chnnel ra name achi --> jetikita same chnanel name ra doucment achhi stiki subscriber
+
+
+### Gote subscriber keteta channel ku subscribe karichi kemiti find kariba
+
+- subcriber ku find kariba and se jau jau  document re exist karuchi taa ra corresponding channel name ku retrieve karidaba
+
+
+
+# Aggregation pipelines
+
+- subcription model ku work kariba pain amaku subsription ru jaha  bi information miliba taku ame join karidaba user re ---. and aku left join kuhajae
+
+- so aku implement kariba pain amaku aggreagtion pipelines sikhibaku padiba
+
+## How to write pipeline
+
+- [ {1st}, {2nd}, {3rd} ..] --> so aa bhitare ame pipeline lekhiba
+
+- {$match || $lookup} --> 1st piepeline bhiare generally match kara jae or join kara jae --> join kariba pain lookup use hue
+
+- {$addField} --> 2nd pipeline bhitare ame addField use kari new field create kaeipariba
+
+
+
+
+
+
  
   
 

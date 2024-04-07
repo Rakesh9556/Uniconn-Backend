@@ -487,6 +487,104 @@ const updateUserCoverImage = asyncHandeler(async (req, res) => {
 })
 
 
+//  subsription 
+
+// user profile
+const getUserProfile = asyncHandeler(async (req, res) => {
+    // user profile dekhibaku hele ame user ra url ku visit karu ex: /rakeshguru, etc
+    //Step1: so req jau miliba body ru nuhen param ru miliba
+    const {username} = req.params
+
+    // jadi username nathiba 
+    if (!username?.trim()) {  // optioally unchain
+        throw new ApiError(400, "Username is missing")
+    }
+
+    // Step2: Username ru document find kariba aggregate pipeline use kari
+    const follower = await User.aggregate([
+        {
+            //1st pipeline
+            $match: {
+                username: username?.toLowerCase()
+            }
+        },
+        {
+            // 2nd pipeline lookup: join kairba pain use hue
+            $lookup: {
+                from: "followers", // kauthu dekhibaku chanhucha // sabu lowercase and plural re rahiba
+                localField: "_id",
+                foreignField: "followedBy",  // channel
+                as: "followedBy"
+            }
+        },
+        {
+            // 3rd pipeline -- lookup
+            $lookup: {
+                from: "followers", // kauthu dekhibaku chanhucha // sabu lowercase and plural re rahiba
+                localField: "_id",
+                foreignField: "followingTo",  // subscriber
+                as: "followingTo"
+            }
+        },
+        {
+            // 4th pipeline to add both and also additional fields
+            $addFields: {
+                followedByCount: {
+                    // for calculating all documents --> $  size
+                    $size: "$followedBy"
+                },
+                followedToCount: {
+                    // for calculating all documents --> $  size
+                    $size: "$followingTo"
+                }, 
+                // check kariba user follow karichi ki nahin
+                isFollowed: {
+                    $cond: {     // condition re 3 ta parameter achhi if, then (true), else (false) 
+                        if: {$in: [req.user?._id, "$followedBy.followedBy"]},  // jadi already login heiki achha ta user access already thiba // in check akre a filed present achi ki nahin
+                        then: true,
+                        else: false
+                    }  
+                }
+            }
+
+        },
+        {
+            // 5th pipeline
+            $project: {  // slected value ku provide kariba
+                fullName: 1,
+                username: 1,
+                role: 1,
+                department: 1,
+                bio: 1,
+                avatar: 1,
+                coverImage: 1,
+                posts: 1,
+                email: 1,
+                createdAt: 1,
+                followedByCount: 1,
+                followedToCount: 1,
+                isFollowed: 1
+
+
+
+
+            }    
+        }
+    ])
+
+    if(!follower?.length) {
+        throw new ApiError(404, "Follower not exist")
+    }
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, follower[0], "User follower fetched successfully"))
+
+
+
+})
+
+
 export {
     registerUser,
     loginUser,
@@ -496,5 +594,6 @@ export {
     getCurrentUser,
     updateUserDetails,
     updateUserAvatar,
-    updateUserCoverImage
+    updateUserCoverImage,
+    getUserProfile
 }
