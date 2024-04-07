@@ -33,6 +33,10 @@ const userSchema = new Schema(
             required: true, 
         },
 
+        bio: {
+            type: String,  
+        },
+
         posts: [
             { 
                 type: Schema.Types.ObjectId,
@@ -45,7 +49,7 @@ const userSchema = new Schema(
             ref: "User_role"
         },
 
-        Department: {
+        department: {
             type: Schema.Types.ObjectId,
             ref: "Department"
         },
@@ -65,15 +69,15 @@ const userSchema = new Schema(
     }
 )
 
-userSchema.pre("save", async function(next){
+userSchema.pre("save", async function(next){   // jebe jebe save haba setethara db ku request send haba sabu ku update kariba pain
     if(!this.isModified("password")) return next();
 
     this.password = await bcrypt.hash(this.password, 10)
     next()
 })
 
-userSchema.methods.isPasswordCorrect = async function(password){
-     return await bcrypt.compare(password, this.password)
+userSchema.methods.isPasswordCorrect = async function(password){  // compare both password bycrypt password and user entered password 
+     return await bcrypt.compare(password, this.password)    // password change pain a method help kariba
 }
 
 userSchema.methods.generateAccessToken = function(){

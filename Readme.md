@@ -621,6 +621,15 @@ app.use(cookieParser())
 
 
 
+ ### Follower model create kariba
+
+
+ ### add more controller to user
+
+ - change current password 
+
+
+
  
   
 

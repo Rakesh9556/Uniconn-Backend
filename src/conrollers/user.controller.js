@@ -166,7 +166,7 @@ const loginUser = asyncHandeler(async (req, res) => {
         throw new ApiError(400, "Email is required")
     }
 
-    // if(username && email) { 
+    // if(!(username || email)) { 
     //     throw new ApiError(400, "Username or email is required")
     // }
     
@@ -309,9 +309,192 @@ const refreshAccessToken = asyncHandeler(async (req, res) => {
 
 })
 
+const changeCurrentPassword = asyncHandeler(async (req, res) => {
+     
+    // pasword change kala bele user thu kna kna require field naba ---> 1. current pass, 2. new pass
+     const {oldPassword, newPassword, confirmPassword} = req.body   
+
+     // user ku acces kariba taki tara password change kariba --> findById --> ethire user milijiba and update karipariba password field ku
+     const user = User.findById(req.user?._id)  // user ku accesss kariba pain, req.user bhitaare user achi (from auth midle ware)
+
+      // isPasswordCorrect gote method achi seita true orr false valu daba jadi ama old password user correct entry kariba then jai ame password change karipariba
+      const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)  // isPasswordCorrect bhitare ame amara old passsword ku pass kariba and ei  check kariba j ame entered karitiba old password database re thiba encrypted password saha equal hauchi ki nahin 
+  
+      if(!isPasswordCorrect) {             // old password encrypted password saha equal na hele error throw kara
+        return new ApiError(400, "Invalid old password")  
+      }
+
+      // vlaidate newPassword and confirm password
+      if (newPassword === confirmPassword) {
+        throw new ApiError(400, "Password do not match")
+      }
+
+      // jehetu ame user ku access kariche so user bhitare password field achhi, so taku update kari newPassword set karidaba
+      user.password = newPassword   // password update hele amara pre hook chaliba and then user.model re thiba pree hook check kariba j jadi password re kichhi modify heichi then se password ku bycrypt kariba and again store kariba
+      
+      //  ame upare khali set kariche newPaassword ku  hele save karine so
+      await user.save({validateBeforeSave: false})  // user re save kariba purbaru ame au sabu validation ku run karibaku chanhune sethipain validateBeforeSave ku use kariba 
+
+      // jadi password successfully change heijaichi then user ku gote responese send karidaba
+      res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Password changed successfully"))
+
+
+
+
+})
+
+
+// jadi user logged in achhi tahale req.user re ame current user ku access karipariba
+const getCurrentUser = asyncHandeler(async (req, res) => {
+    return res
+    .status(200)
+    .json(new ApiResponse(200, req.user, "current user fetched successfully"))
+})
+
+
+// field jauta ame update kari pariba user ra  ---> profile photo, username, bio, etc
+
+// text filed update 
+const updateUserDetails = asyncHandeler(async (req, res) => {
+    // Step1: update kala bele user thu kna kna require filed naba (req.body)
+    const {fullName, email, bio, role, department} = req.body;
+
+    //Step2: atleast gote filed update karibaku padiba and  jadi user kichhi update karibaku deini ---> error thorw kariba
+    // jadi kebala gote filed thile bi update kariba
+    if (!(fullName || email || bio || role || department)) {
+        throw new ApiError(400, "Atleast one filed is required")
+    }
+
+    // jadi sabu filed ku update kariba darkar eka ebele
+    // if (!fullName || !email || !bio || !role || !department) {
+    //     throw new ApiError(400, "All fileds are required")
+    // }
+
+    // Step3: update kariba pain data ku backend patheiba but ame kau user re update kariba, so first user find karib
+    // update
+    const user = User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            // mongo operator
+            $set: {
+                fullName,
+                // or fullName: fullName
+                email,
+                bio,
+                role,
+                department
+            }
+        },
+        {new: true}    // new: true karidele update hela pare information asi ethi user re store hue
+    ).select("-password")  // ame chanhune j update hela bela ame password au thare update hau so ame slect method re password ku hateidaba update ru
+
+    // Step4: user ku return kariba gote response
+    res
+    .status(200)
+    .json(new ApiResponse(200, user, "Profile updated"))
+
+    // Step5: export karidaba
+
+})
+
+// file update (avatar)
+const updateUserAvatar = asyncHandeler(async (req, res) => {
+    // Step1 : user authentication ku check kariba user exist karuchi ki nahin, so
+    if (!req.user) {
+        throw new ApiError(401, "Unauthorized access")
+    }
+
+    // Step2: jadi user exist karuchi then taa ra user id find kariba
+    // Step1: multer middle ware use kari file access kariba 
+    const avatarLocalPath = req.file?.path  //  avatar jadi present achhi then taa ra path access kariba
+
+    // check kariba avatarLocal path achhi na nahin
+    if (!avatarLocalPath) {
+        throw new ApiError(400, "Avatar file is missing")
+    }
+
+    // Step2: jadi file path thik achi then avatar ku cloudinary re upload karidaba
+    const avatar = await uploadOnCloudinary(avatarLocalPath)
+
+    // Step3: jadi avatar upload heijaichi but upload hela pare tara url miluni then error throw kara
+    if (!avatar.url) {
+        throw new ApiError(400, "Error while uploading avatar")  
+    }
+
+    // Step4: ebe update karidaba avatar ku
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,  // a line user ku find kariba
+        {
+            $set: {
+                avatar: avatar.url
+            }
+        },
+        {new: true}   // new true kale updated avatar asi user re store hue
+    ).select("-password") // user avatar update kala bele password update na heijau sethipain password filed ku hateidab update ru
+
+
+    // Step5: jadi successfully update heijaichi then user ku gote response sned karidaba
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Avatar successfully updated"))
+
+})
+
+
+// file update (coverImage)
+const updateUserCoverImage = asyncHandeler(async (req, res) => {
+    // Step1 : user authentication ku check kariba user exist karuchi ki nahin, so
+    if (!req.user) {
+        throw new ApiError(401, "Unauthorized access")
+    }
+
+    // Step2: jadi user exist karuchi then taa ra user id find kariba
+    // Step1: multer middle ware use kari file access kariba 
+    const coverImageLocalPath = req.file?.path  //  avatar jadi present achhi then taa ra path access kariba
+
+    // check kariba avatarLocal path achhi na nahin
+    if (!coverImageLocalPath) {
+        throw new ApiError(400, "Cover image file is missing")
+    }
+
+    // Step2: jadi file path thik achi then avatar ku cloudinary re upload karidaba
+    const coverImage = await uploadOnCloudinary(coverImageLocalPathLocalPath)
+
+    // Step3: jadi avatar upload heijaichi but upload hela pare tara url miluni then error throw kara
+    if (!coverImage.url) {
+        throw new ApiError(400, "Error while uploading cover image")  
+    }
+
+    // Step4: ebe update karidaba avatar ku
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,  // a line user ku find kariba
+        {
+            $set: {
+                coverImage: coverImage.url
+            }
+        },
+        {new: true}   // new true kale updated avatar asi user re store hue
+    ).select("-password") // user avatar update kala bele password update na heijau sethipain password filed ku hateidab update ru
+
+
+    // Step5: jadi successfully update heijaichi then user ku gote response sned karidaba
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Cover image successfully updated"))
+
+})
+
+
 export {
     registerUser,
     loginUser,
     logoutUser,
-    refreshAccessToken 
+    refreshAccessToken,
+    changeCurrentPassword,
+    getCurrentUser,
+    updateUserDetails,
+    updateUserAvatar,
+    updateUserCoverImage
 }
